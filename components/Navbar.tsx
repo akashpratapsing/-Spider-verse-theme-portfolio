@@ -1,6 +1,18 @@
 import React from "react";
+import LocomotiveScroll from 'locomotive-scroll';
 
-const Navbar: React.FC = () => {
+interface NavbarProps {
+  scroll: LocomotiveScroll | null;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ scroll }) => {
+  const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+    e.preventDefault();
+    if (scroll) {
+      scroll.scrollTo(targetId);
+    }
+  };
+
   return (
     <nav className="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 py-4 bg-[#0A0B1E]/90 backdrop-blur-md border-b-4 border-black">
       {/* Logo Speech Bubble */}
@@ -19,6 +31,7 @@ const Navbar: React.FC = () => {
           <a
             key={item}
             href={`#${item.toLowerCase()}`}
+            onClick={(e) => handleScroll(e, `#${item.toLowerCase()}`)}
             className="font-comic text-xl tracking-wider uppercase split-hover transition-all duration-300 relative group"
           >
             {item}

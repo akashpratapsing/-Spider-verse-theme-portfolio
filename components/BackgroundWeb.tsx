@@ -1,7 +1,12 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
+import LocomotiveScroll from 'locomotive-scroll';
 
-const BackgroundWeb: React.FC = () => {
+interface BackgroundWebProps {
+  scroll: LocomotiveScroll | null;
+}
+
+const BackgroundWeb: React.FC<BackgroundWebProps> = ({ scroll }) => {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
   const [scrollY, setScrollY] = useState(0);
@@ -16,7 +21,7 @@ const BackgroundWeb: React.FC = () => {
       });
     };
 
-    const handleScroll = () => {
+    const handleWindowScroll = () => {
       setScrollY(window.scrollY);
     };
 
@@ -29,13 +34,21 @@ const BackgroundWeb: React.FC = () => {
     }, 2000);
 
     window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('scroll', handleScroll);
+    
+    if (scroll) {
+      scroll.on('scroll', (args: any) => {
+        setScrollY(args.scroll.y);
+      });
+    } else {
+      window.addEventListener('scroll', handleWindowScroll);
+    }
+
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('scroll', handleWindowScroll);
       clearInterval(glitchInterval);
     };
-  }, []);
+  }, [scroll]);
 
   // Pre-generate "Multiverse Shards"
   const shards = useMemo(() => {

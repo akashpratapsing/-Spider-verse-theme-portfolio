@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import SkillsWeb from './components/SkillsWeb';
@@ -7,9 +6,13 @@ import ProjectsGrid from './components/ProjectsGrid';
 import EducationWeb from './components/EducationWeb';
 import Footer from './components/Footer';
 import BackgroundWeb from './components/BackgroundWeb';
+import LocomotiveScroll from 'locomotive-scroll';
+import 'locomotive-scroll/dist/locomotive-scroll.css';
 
 const App: React.FC = () => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [scroll, setScroll] = useState<LocomotiveScroll | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const playThwipSound = () => {
     try {
@@ -43,14 +46,40 @@ const App: React.FC = () => {
   useEffect(() => {
     setIsLoaded(true);
     
+    // Initialize Locomotive Scroll
+    let scrollInstance: LocomotiveScroll | null = null;
+    if (scrollRef.current) {
+      scrollInstance = new LocomotiveScroll({
+        el: scrollRef.current,
+        smooth: true,
+        multiplier: 1,
+        class: 'is-revealed',
+        // @ts-ignore
+        tablet: { smooth: true },
+        // @ts-ignore
+        smartphone: { smooth: true }
+      });
+      setScroll(scrollInstance);
+    }
+
     // Global click listener for the 'thwip' effect
     const handleGlobalClick = () => {
       playThwipSound();
     };
 
+    // Handle resize to update scroll calculations
+    const handleResize = () => {
+      if (scrollInstance) scrollInstance.update();
+    };
+
     window.addEventListener('click', handleGlobalClick);
+    window.addEventListener('resize', handleResize);
+
     return () => {
       window.removeEventListener('click', handleGlobalClick);
+      window.removeEventListener('resize', handleResize);
+      if (scrollInstance) scrollInstance.destroy();
+      setScroll(null);
     };
   }, []);
 
@@ -58,9 +87,11 @@ const App: React.FC = () => {
     <div className={`min-h-screen transition-opacity duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
       <BackgroundWeb />
       
-      <div className="relative z-10">
-        <Navbar />
-        <main>
+      {/* Navbar moved outside the scroll container to maintain fixed positioning */}
+      <Navbar scroll={scroll} />
+
+      <div className="relative z-10" ref={scrollRef} data-scroll-container>
+        <main data-scroll-section>
           <Hero />
           <SkillsWeb />
           <ProjectsGrid />

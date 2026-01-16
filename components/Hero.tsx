@@ -1,7 +1,12 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+import LocomotiveScroll from 'locomotive-scroll';
 
-const Hero: React.FC = () => {
+interface HeroProps {
+  scroll: LocomotiveScroll | null;
+}
+
+const Hero: React.FC<HeroProps> = ({ scroll }) => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [scrollProgress, setScrollProgress] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
@@ -22,12 +27,22 @@ const Hero: React.FC = () => {
     };
 
     window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('scroll', handleScroll);
+    
+    if (scroll) {
+      scroll.on('scroll', (args: any) => {
+        const scrolled = args.scroll.y;
+        const windowHeight = window.innerHeight;
+        setScrollProgress(Math.min(scrolled / windowHeight, 1));
+      });
+    } else {
+      window.addEventListener('scroll', handleScroll);
+    }
+
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('scroll', handleScroll);
     };
-  }, []);
+  }, [scroll]);
 
   const radialLines = 24;
   const layers = 10;
