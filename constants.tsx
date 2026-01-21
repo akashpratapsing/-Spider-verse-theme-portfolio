@@ -20,7 +20,7 @@ export const PROJECTS: Project[] = [
     "description": "A full-stack Gen-AI meal planner integrating Gemini AI, Razorpay payments, and MongoDB persistence with internal/external API orchestration.",
     "tags": ["Spring Boot", "Generative AI", "React", "MongoDB"],
     "image": fitmeal,
-    "link": "https://github.com/akashpratapsing/AI-Meal-Planner"
+    "link": "https://fitmealx.netlify.app/"
   },
   {
     "id": "sentinel-backend",
